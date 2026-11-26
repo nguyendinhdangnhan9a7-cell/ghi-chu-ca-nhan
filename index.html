@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ghi Chú Cá Nhân & Lịch Nhắc Việc</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --success: #16a34a;
+      --border: #e2e8f0;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 16px 60px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .notif-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-outline {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.25);
+      border-color: var(--primary);
+    }
+
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .note-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .note-card.dragging {
+      opacity: 0.55;
+      transform: scale(0.99);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+    }
+
+    .note-card.drag-over {
+      border-top: 3px solid var(--primary);
+    }
+
+    .note-card.done {
+      border-left-color: var(--success);
+      opacity: 0.85;
+    }
+
+    .note-card.due-soon {
+      border-left-color: var(--warning);
+      background: #fffbeb;
+    }
+
+    .note-card.overdue {
+      border-left-color: var(--danger);
+      background: #fef2f2;
+    }
+
+    .note-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .note-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--muted);
+      font-size: 1.1rem;
+      user-select: none;
+      padding: 2px 4px;
+    }
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .note-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    .note-card.done .note-title {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .badge.high {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .badge.medium {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .badge.low {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .badge.reminder {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+    .badge.overdue-badge {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .note-content {
+      color: #334155;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+      font-size: 0.94rem;
+    }
+
+    .note-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+
+    /* Banner nhắc việc trong trang */
+    .alert-banner {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      max-width: 360px;
+      background: #0f172a;
+      color: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      z-index: 999;
+      display: none;
+    }
+
+    .alert-banner.show {
+      display: block;
+      animation: slideUp 0.25s ease;
+    }
+
+    .alert-banner h4 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: #fbbf24;
+    }
+
+    .alert-banner p {
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(16px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Ghi Chú Cá Nhân &amp; Lịch Nhắc Việc</h1>
+        <p>Lưu trữ cục bộ bằng <code>localStorage</code> • Sắp xếp thủ công hoặc theo lịch nhắc</p>
+      </div>
+      <div class="notif-bar">
+        <button id="btnEnableNotif" class="btn btn-outline btn-sm" type="button">
+          🔔 Bật thông báo trình duyệt
+        </button>
+      </div>
+    </header>
+
+    <!-- Form thêm / sửa ghi chú -->
+    <section class="panel">
+      <form id="noteForm">
+        <input type="hidden" id="editId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="titleInput">Tiêu đề ghi chú *</label>
+            <input type="text" id="titleInput" placeholder="VD: Nộp báo cáo môn Python..." required />
+          </div>
+
+          <div class="form-group">
+            <label for="reminderInput">Lịch nhắc việc (ngày &amp; giờ)</label>
+            <input type="datetime-local" id="reminderInput" />
+          </div>
+
+          <div class="form-group">
+            <label for="priorityInput">Mức ưu tiên</label>
+            <select id="priorityInput">
+              <option value="medium">Trung bình</option>
+              <option value="high">Cao</option>
+              <option value="low">Thấp</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="contentInput">Nội dung ghi chú</label>
+            <textarea id="contentInput" placeholder="Chi tiết công việc, ý tưởng hoặc ghi nhớ..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="btnSubmit" class="btn btn-primary">➕ Thêm ghi chú</button>
+          <button type="button" id="btnCancelEdit" class="btn btn-outline" style="display: none;">
+            Hủy sửa
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Thanh công cụ lọc & sắp xếp -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="🔍 Tìm theo tiêu đề hoặc nội dung..."
+          style="width: 240px;"
+        />
+        <select id="filterSelect">
+          <option value="all">Tất cả ghi chú</option>
+          <option value="pending">Chưa hoàn thành</option>
+          <option value="done">Đã hoàn thành</option>
+          <option value="with-reminder">Có lịch nhắc</option>
+        </select>
+      </div>
+
+      <div class="toolbar-right">
+        <label for="sortSelect" style="margin: 0;">Sắp xếp:</label>
+        <select id="sortSelect">
+          <option value="manual">Thứ tự tùy chỉnh (Kéo thả)</option>
+          <option value="reminder-asc">Lịch nhắc: Sớm nhất trước</option>
+          <option value="reminder-desc">Lịch nhắc: Muộn nhất trước</option>
+          <option value="priority">Mức ưu tiên (Cao → Thấp)</option>
+          <option value="created-desc">Mới tạo nhất</option>
+          <option value="created-asc">Cũ nhất</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Danh sách ghi chú -->
+    <section id="notesList" class="notes-list"></section>
+  </div>
+
+  <!-- Thông báo nổi trong giao diện -->
+  <div id="alertBanner" class="alert-banner">
+    <h4 id="alertTitle">⏰ Đến giờ nhắc việc!</h4>
+    <p id="alertBody"></p>
+    <button id="btnDismissAlert" class="btn btn-warning btn-sm" type="button">Đã hiểu</button>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "personal_notes_with_reminders_v1";
+
+    let notes = [];
+    let draggedId = null;
+
+    const noteForm = document.getElementById("noteForm");
+    const editIdInput = document.getElementById("editId");
+    const titleInput = document.getElementById("titleInput");
+    const contentInput = document.getElementById("contentInput");
+    const reminderInput = document.getElementById("reminderInput");
+    const priorityInput = document.getElementById("priorityInput");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const btnCancelEdit = document.getElementById("btnCancelEdit");
+
+    const searchInput = document.getElementById("searchInput");
+    const filterSelect = document.getElementById("filterSelect");
+    const sortSelect = document.getElementById("sortSelect");
+    const notesList = document.getElementById("notesList");
+
+    const btnEnableNotif = document.getElementById("btnEnableNotif");
+    const alertBanner = document.getElementById("alertBanner");
+    const alertTitle = document.getElementById("alertTitle");
+    const alertBody = document.getElementById("alertBody");
+    const btnDismissAlert = document.getElementById("btnDismissAlert");
+
+    function loadNotes() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        notes = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(notes)) notes = [];
+      } catch (e) {
+        notes = [];
+      }
+    }
+
+    function saveNotes() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str || "";
+      return div.innerHTML;
+    }
+
+    function formatReminder(isoString) {
+      if (!isoString) return null;
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return null;
+      return d.toLocaleString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function getReminderStatus(note) {
+      if (!note.reminderAt || note.completed) return "normal";
+      const target = new Date(note.reminderAt).getTime();
+      const now = Date.now();
+      const diffMinutes = (target - now) / 60000;
+      if (diffMinutes < 0) return "overdue";
+      if (diffMinutes <= 30) return "due-soon";
+      return "normal";
+    }
+
+    function priorityRank(p) {
+      if (p === "high") return 3;
+      if (p === "medium") return 2;
+      return 1;
+    }
+
+    function getFilteredAndSortedNotes() {
+      const q = searchInput.value.trim().toLowerCase();
+      const filterVal = filterSelect.value;
+      const sortVal = sortSelect.value;
+
+      let list = notes.filter((n) => {
+        const matchesQuery =
+          !q ||
+          (n.title && n.title.toLowerCase().includes(q)) ||
+          (n.content && n.content.toLowerCase().includes(q));
+
+        if (!matchesQuery) return false;
+        if (filterVal === "pending") return !n.completed;
+        if (filterVal === "done") return n.completed;
+        if (filterVal === "with-reminder") return Boolean(n.reminderAt);
+        return true;
+      });
+
+      if (sortVal === "manual") {
+        list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      } else if (sortVal === "reminder-asc") {
+        list.sort((a, b) => {
+          if (!a.reminderAt && !b.reminderAt) return 0;
+          if (!a.reminderAt) return 1;
+          if (!b.reminderAt) return -1;
+          return new Date(a.reminderAt) - new Date(b.reminderAt);
+        });
+      } else if (sortVal === "reminder-desc") {
+        list.sort((a, b) => {
+          if (!a.reminderAt && !b.reminderAt) return 0;
+          if (!a.reminderAt) return 1;
+          if (!b.reminderAt) return -1;
+          return new Date(b.reminderAt) - new Date(a.reminderAt);
+        });
+      } else if (sortVal === "priority") {
+        list.sort((a, b) => priorityRank(b.priority) - priorityRank(a.priority));
+      } else if (sortVal === "created-desc") {
+        list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      } else if (sortVal === "created-asc") {
+        list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      }
+
+      return list;
+    }
+
+    function renderNotes() {
+      const visibleNotes = getFilteredAndSortedNotes();
+      const isManual = sortSelect.value === "manual" && !searchInput.value.trim() && filterSelect.value === "all";
+
+      if (visibleNotes.length === 0) {
+        notesList.innerHTML = `
+          <div class="empty-state">
+            Chưa có ghi chú nào phù hợp. Hãy thêm ghi chú mới ở biểu mẫu phía trên!
+          </div>
+        `;
+        return;
+      }
+
+      const priorityLabel = {
+        high: "Ưu tiên cao",
+        medium: "Trung bình",
+        low: "Thấp"
+      };
+
+      notesList.innerHTML = visibleNotes
+        .map((note) => {
+          const status = getReminderStatus(note);
+          const reminderText = formatReminder(note.reminderAt);
+          const cardClasses = [
+            "note-card",
+            note.completed ? "done" : "",
+            status === "due-soon" ? "due-soon" : "",
+            status === "overdue" ? "overdue" : ""
+          ]
+            .filter(Boolean)
+            .join(" ");
+
+          return `
+            <article
+              class="${cardClasses}"
+              data-id="${note.id}"
+              draggable="${isManual}"
+            >
+              <div class="note-top">
+                <div class="note-title-wrap">
+                  ${isManual ? `<span class="drag-handle" title="Kéo để sắp xếp thứ tự">☰</span>` : ""}
+                  <h3 class="note-title">${escapeHtml(note.title)}</h3>
+                  <span class="badge ${note.priority || "medium"}">${priorityLabel[note.priority] || "Trung bình"}</span>
+                  ${
+                    reminderText
+                      ? `<span class="badge ${status === "overdue" ? "overdue-badge" : "reminder"}">
+                          ⏰ ${reminderText}${status === "overdue" ? " (Quá hạn)" : ""}
+                         </span>`
+                      : ""
+                  }
+                </div>
+              </div>
+
+              ${note.content ? `<div class="note-content">${escapeHtml(note.content)}</div>` : ""}
+
+              <div class="note-footer">
+                <span>Tạo lúc: ${new Date(note.createdAt).toLocaleString("vi-VN")}</span>
+                <div class="note-actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm ${note.completed ? "btn-outline" : "btn-success"}"
+                    onclick="toggleComplete('${note.id}')"
+                  >
+                    ${note.completed ? "↩ Bỏ hoàn thành" : "✓ Hoàn thành"}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline"
+                    onclick="startEdit('${note.id}')"
+                  >
+                    ✏️ Sửa
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    onclick="deleteNote('${note.id}')"
+                  >
+                    🗑 Xóa
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      if (isManual) {
+        attachDragEvents();
+      }
+    }
+
+    function attachDragEvents() {
+      const cards = notesList.querySelectorAll(".note-card[draggable='true']");
+      cards.forEach((card) => {
+        card.addEventListener("dragstart", () => {
+          draggedId = card.dataset.id;
+          card.classList.add("dragging");
+        });
+
+        card.addEventListener("dragend", () => {
+          card.classList.remove("dragging");
+          cards.forEach((c) => c.classList.remove("drag-over"));
+          draggedId = null;
+        });
+
+        card.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          if (card.dataset.id !== draggedId) {
+            card.classList.add("drag-over");
+          }
+        });
+
+        card.addEventListener("dragleave", () => {
+          card.classList.remove("drag-over");
+        });
+
+        card.addEventListener("drop", (e) => {
+          e.preventDefault();
+          card.classList.remove("drag-over");
+          const targetId = card.dataset.id;
+          if (!draggedId || draggedId === targetId) return;
+
+          notes.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+          const fromIdx = notes.findIndex((n) => n.id === draggedId);
+          const toIdx = notes.findIndex((n) => n.id === targetId);
+          if (fromIdx === -1 || toIdx === -1) return;
+
+          const [moved] = notes.splice(fromIdx, 1);
+          notes.splice(toIdx, 0, moved);
+
+          notes.forEach((item, idx) => {
+            item.order = idx;
+          });
+
+          saveNotes();
+          renderNotes();
+        });
+      });
+    }
+
+    function resetForm() {
+      editIdInput.value = "";
+      noteForm.reset();
+      priorityInput.value = "medium";
+      btnSubmit.textContent = "➕ Thêm ghi chú";
+      btnCancelEdit.style.display = "none";
+    }
+
+    noteForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      if (!title) return;
+
+      const content = contentInput.value.trim();
+      const reminderAt = reminderInput.value || null;
+      const priority = priorityInput.value;
+      const editingId = editIdInput.value;
+
+      if (editingId) {
+        const idx = notes.findIndex((n) => n.id === editingId);
+        if (idx !== -1) {
+          const reminderChanged = notes[idx].reminderAt !== reminderAt;
+          notes[idx] = {
+            ...notes[idx],
+            title,
+            content,
+            reminderAt,
+            priority,
+            notified: reminderChanged ? false : notes[idx].notified
+          };
+        }
+      } else {
+        const minOrder = notes.length ? Math.min(...notes.map((n) => n.order ?? 0)) : 0;
+        notes.push({
+          id: "note_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+          title,
+          content,
+          reminderAt,
+          priority,
+          completed: false,
+          notified: false,
+          createdAt: Date.now(),
+          order: minOrder - 1
+        });
+      }
+
+      saveNotes();
+      renderNotes();
+      resetForm();
+    });
+
+    btnCancelEdit.addEventListener("click", resetForm);
+
+    window.startEdit = function (id) {
+      const note = notes.find((n) => n.id === id);
+      if (!note) return;
+      editIdInput.value = note.id;
+      titleInput.value = note.title;
+      contentInput.value = note.content || "";
+      reminderInput.value = note.reminderAt || "";
+      priorityInput.value = note.priority || "medium";
+      btnSubmit.textContent = "💾 Lưu thay đổi";
+      btnCancelEdit.style.display = "inline-flex";
+      titleInput.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.toggleComplete = function (id) {
+      const note = notes.find((n) => n.id === id);
+      if (!note) return;
+      note.completed = !note.completed;
+      saveNotes();
+      renderNotes();
+    };
+
+    window.deleteNote = function (id) {
+      notes = notes.filter((n) => n.id !== id);
+      notes.forEach((n, idx) => (n.order = idx));
+      saveNotes();
+      renderNotes();
+      if (editIdInput.value === id) resetForm();
+    };
+
+    // Lịch nhắc việc: kiểm tra mỗi 15 giây khi trang đang mở
+    function triggerReminderAlert(note) {
+      alertTitle.textContent = `⏰ Nhắc việc: ${note.title}`;
+      alertBody.textContent = note.content || "Đã tới thời gian nhắc việc bạn đã đặt.";
+      alertBanner.classList.add("show");
+
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(`Nhắc việc: ${note.title}`, {
+          body: note.content || "Đã tới giờ nhắc việc!"
+        });
+      }
+    }
+
+    function checkReminders() {
+      const now = Date.now();
+      let changed = false;
+
+      notes.forEach((note) => {
+        if (!note.reminderAt || note.completed || note.notified) return;
+        const target = new Date(note.reminderAt).getTime();
+        if (!isNaN(target) && now >= target) {
+          note.notified = true;
+          changed = true;
+          triggerReminderAlert(note);
+        }
+      });
+
+      if (changed) {
+        saveNotes();
+      }
+      renderNotes();
+    }
+
+    btnDismissAlert.addEventListener("click", () => {
+      alertBanner.classList.remove("show");
+    });
+
+    btnEnableNotif.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        alert("Trình duyệt này không hỗ trợ Notification API.");
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        btnEnableNotif.textContent = "✅ Thông báo đã bật";
+      }
+    });
+
+    searchInput.addEventListener("input", renderNotes);
+    filterSelect.addEventListener("change", renderNotes);
+    sortSelect.addEventListener("change", renderNotes);
+
+    // Khởi tạo
+    loadNotes();
+    renderNotes();
+    checkReminders();
+    setInterval(checkReminders, 15000);
+  </script>
+</body>
+</html>
